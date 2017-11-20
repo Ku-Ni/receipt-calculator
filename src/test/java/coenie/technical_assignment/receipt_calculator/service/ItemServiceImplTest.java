@@ -1,6 +1,7 @@
 package coenie.technical_assignment.receipt_calculator.service;
 
 import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,9 @@ import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.Mock;
 
+import coenie.technical_assignment.receipt_calculator.dao.ItemDao;
 import coenie.technical_assignment.receipt_calculator.model.Item;
 
 public class ItemServiceImplTest {
@@ -31,11 +34,23 @@ public class ItemServiceImplTest {
 	
 	private ItemService itemService;
 	
+	@Mock
+	ItemDao mockDao;
+	
 	@Before
 	public void setUp() {
-		itemService = new ItemServiceImpl();
+		setupMockDao();
+		itemService = new ItemServiceImpl(mockDao);
 	}
 
+	private void setupMockDao() {
+		mockDao = mock(ItemDao.class);
+		
+		// Use local items as mock repository
+		when(mockDao.findItemByName(anyString())).thenAnswer(i -> items.get(i.getArguments()[0]));
+	}
+
+	
 	@Test
 	public final void testGetItem() {
 		String testName = "Apples";

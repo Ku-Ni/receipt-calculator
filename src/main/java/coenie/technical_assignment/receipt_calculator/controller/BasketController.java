@@ -21,11 +21,13 @@ public class BasketController {
 	private CostService costService;
 	private ItemService itemService;
 	
+	
 	@Autowired
 	public BasketController(CostService costService, ItemService itemService) {
 		this.costService = costService;
 		this.itemService = itemService;
 	}
+	
 	
 	@RequestMapping(value="/receipt", method = RequestMethod.POST)
 	public Receipt calculateReceipt(@RequestBody List<String> itemNames) {
