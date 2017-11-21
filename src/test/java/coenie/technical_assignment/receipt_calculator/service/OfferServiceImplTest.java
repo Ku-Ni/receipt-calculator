@@ -26,4 +26,9 @@ public class OfferServiceImplTest {
 		fail("Not yet implemented"); // TODO
 	}
 
+	@Test
+	public final void testGetItemOffers() {
+		fail("Not yet implemented"); // TODO
+	}
+
 }

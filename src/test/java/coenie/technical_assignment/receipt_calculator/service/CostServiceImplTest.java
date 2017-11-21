@@ -32,44 +32,37 @@ public class CostServiceImplTest {
 		items.put("Oranges", new Item("ORANGES", 30));
 		items.put("Garlic", new Item("GARLIC", 15));
 		items.put("Papayas", new Item("PAPAYAS", 50)); // three for the price of two
-		
-		offer = new BuyOneGetOneOffer(
-				"Three for the price of two", items.get("Papayas"), items.get("Papayas"), 3, 1);
 	}
 	
 	
-	@Mock
-	ItemService mockItemService;
 	@Mock
 	OfferService mockOfferService;
 
 	private CostServiceImpl costService;
 
 	
-	
-
-	
 	@Before
 	public void setUp() throws ItemNotOnOfferException {
-		mockItemService = mock(ItemService.class);
-
+		
+		offer = new BuyOneGetOneOffer("Three for the price of two", items.get("Papayas"), 3, 1);
 		mockOffersService();
 
-		costService = new CostServiceImpl(mockItemService, mockOfferService);
+		costService = new CostServiceImpl(mockOfferService);
 	}
 
 
 	private void mockOffersService() throws ItemNotOnOfferException {
 		mockOfferService = mock(OfferService.class);
-		Set<Item> mockOfferItems = new HashSet<>();
-		mockOfferItems.add(items.get("Papaya"));
-		when(mockOfferService.getItemsOnOffer()).thenReturn(mockOfferItems);
-		when(mockOfferService.getItemOffer(items.get("Papaya"))).thenReturn(offer);
+		Map<Item,Offer> mockOfferItems = new HashMap<>();		
+		mockOfferItems.put(items.get("Papayas"), offer);
+		
+		when(mockOfferService.getItemsOnOffer(any())).thenReturn(mockOfferItems);
 	}
 
 
 	@Test
 	public final void testCalculateReceipt() {
+		System.out.println("testCalculateReceipt");
 		List<Item> expectedItems = new ArrayList<>();
 		expectedItems.add(items.get("Apples"));		// 25
 		expectedItems.add(items.get("Papayas"));	// 50
@@ -77,12 +70,13 @@ public class CostServiceImplTest {
 		expectedItems.add(items.get("Garlic"));		// 15
 		expectedItems.add(items.get("Oranges"));	// 30
 
-		List<Offer> expectedOffers = new ArrayList<>();
+		Set<Offer> expectedOffers = new HashSet<>();
 
 		int expectedCost = 170;
 
 
 		Receipt actualReceipt = costService.calculateReceipt(expectedItems);
+		System.out.println(actualReceipt.print());
 
 		assertEquals("Receipt items incorrect",expectedItems, actualReceipt.getItems());
 		assertEquals("Receipt offers incorrect", expectedOffers, actualReceipt.getAppliedOffers());
@@ -92,6 +86,7 @@ public class CostServiceImplTest {
 
 	@Test
 	public final void testCalculateReceipt_IncludeOffer() {
+		System.out.println("testCalculateReceipt_IncludeOffer");
 		List<Item> expectedItems = new ArrayList<>();
 		expectedItems.add(items.get("Apples"));		// 25
 		expectedItems.add(items.get("Papayas"));	// 50
@@ -99,12 +94,13 @@ public class CostServiceImplTest {
 		expectedItems.add(items.get("Papayas"));	// 50
 		expectedItems.add(items.get("Garlic"));		// 15
 
-		List<Offer> expectedOffers = new ArrayList<>();
+		Set<Offer> expectedOffers = new HashSet<>();
 		expectedOffers.add(offer);
 
 		int expectedCost = 140;
 
 		Receipt actualReceipt = costService.calculateReceipt(expectedItems);
+		System.out.println(actualReceipt.print());
 
 		assertEquals("Receipt items incorrect",expectedItems, actualReceipt.getItems());
 		assertEquals("Receipt offers incorrect", expectedOffers, actualReceipt.getAppliedOffers());
@@ -114,6 +110,7 @@ public class CostServiceImplTest {
 
 	@Test
 	public final void testCalculateReceipt_IncludeOneOfferMoreItems() {
+		System.out.println("testCalculateReceipt_IncludeOneOfferMoreItems");
 		List<Item> expectedItems = new ArrayList<>();
 		expectedItems.add(items.get("Apples"));		// 25
 		expectedItems.add(items.get("Papayas"));	// 50
@@ -122,12 +119,13 @@ public class CostServiceImplTest {
 		expectedItems.add(items.get("Papayas"));	// 50
 		expectedItems.add(items.get("Garlic"));		// 15
 
-		List<Offer> expectedOffers = new ArrayList<>();
+		Set<Offer> expectedOffers = new HashSet<>();
 		expectedOffers.add(offer);
 
 		int expectedCost = 190;
 
 		Receipt actualReceipt = costService.calculateReceipt(expectedItems);
+		System.out.println(actualReceipt.print());
 
 		assertEquals("Receipt items incorrect",expectedItems, actualReceipt.getItems());
 		assertEquals("Receipt offers incorrect", expectedOffers, actualReceipt.getAppliedOffers());
@@ -137,6 +135,7 @@ public class CostServiceImplTest {
 
 	@Test
 	public final void testCalculateReceipt_IncludeTwoOffers() {
+		System.out.println("testCalculateReceipt_IncludeTwoOffers");
 		List<Item> expectedItems = new ArrayList<>();
 		expectedItems.add(items.get("Apples"));		// 25
 		expectedItems.add(items.get("Papayas"));	// 50
@@ -147,13 +146,13 @@ public class CostServiceImplTest {
 		expectedItems.add(items.get("Papayas"));	// 50
 		expectedItems.add(items.get("Garlic"));		// 15
 
-		List<Offer> expectedOffers = new ArrayList<>();
-		expectedOffers.add(offer);
+		Set<Offer> expectedOffers = new HashSet<>();
 		expectedOffers.add(offer);
 
 		int expectedCost = 240;
 
 		Receipt actualReceipt = costService.calculateReceipt(expectedItems);
+		System.out.println(actualReceipt.print());
 
 		assertEquals("Receipt items incorrect",expectedItems, actualReceipt.getItems());
 		assertEquals("Receipt offers incorrect", expectedOffers, actualReceipt.getAppliedOffers());

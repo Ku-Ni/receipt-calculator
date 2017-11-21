@@ -1,6 +1,8 @@
 package coenie.technical_assignment.receipt_calculator.model;
 
 import java.util.Objects;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
 public class Item {
 	private String name;
@@ -31,6 +33,12 @@ public class Item {
 	@Override
 	public int hashCode() {
 		return Objects.hash(name, price);
+	}
+
+	@Override
+	public String toString() {
+		return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).append("name", name).append("price", price)
+				.toString();
 	}
 	
 	
