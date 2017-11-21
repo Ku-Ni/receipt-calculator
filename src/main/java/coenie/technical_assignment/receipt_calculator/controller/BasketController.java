@@ -29,14 +29,22 @@ public class BasketController {
 	}
 	
 	
+	@RequestMapping(value="/cost/{item}", method = RequestMethod.GET)
+	public Item getItemCost(@PathVariable String item){
+		return itemService.getItem(item);
+	}
+	
+	
 	@RequestMapping(value="/receipt", method = RequestMethod.POST)
 	public Receipt calculateReceipt(@RequestBody List<String> itemNames) {
 		List<Item> items = itemService.getItems(itemNames);
 		return costService.calculateReceipt(items);
 	}
 	
-	@RequestMapping(value="/cost/{item}", method = RequestMethod.GET)
-	public Item getItemCost(@PathVariable String item){
-		return itemService.getItem(item);
+	
+	@RequestMapping(value="/receipt/print", method = RequestMethod.POST)
+	public String printReceipt(@RequestBody List<String> itemNames) {
+		List<Item> items = itemService.getItems(itemNames);
+		return costService.calculateReceipt(items).print();
 	}
 }
