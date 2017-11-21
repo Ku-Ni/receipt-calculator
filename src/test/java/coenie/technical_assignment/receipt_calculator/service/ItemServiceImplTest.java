@@ -6,8 +6,10 @@ import static org.mockito.Mockito.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Before;
@@ -15,12 +17,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mock;
 
-import coenie.technical_assignment.receipt_calculator.dao.ItemDao;
+import coenie.technical_assignment.receipt_calculator.dao.Dao;
+import coenie.technical_assignment.receipt_calculator.model.BuyOneGetOneOffer;
 import coenie.technical_assignment.receipt_calculator.model.Item;
+import coenie.technical_assignment.receipt_calculator.model.Offer;
 
 public class ItemServiceImplTest {
 
 	private static Map<String, Item> items;
+	private static Offer mockOffer1, mockOffer2;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() {
@@ -29,13 +34,16 @@ public class ItemServiceImplTest {
 		items.put("Oranges", new Item("ORANGES", 30));
 		items.put("Garlic", new Item("GARLIC", 15));
 		items.put("Papayas", new Item("PAPAYAS", 50)); 
+		
+		mockOffer1 = new BuyOneGetOneOffer("Three for the price of two", items.get("Papayas"), 3, 1);
+		mockOffer2 = new BuyOneGetOneOffer("buy one get one free", items.get("Oranges"), 2, 1);
 	}
 	
 	
 	private ItemService itemService;
 	
 	@Mock
-	ItemDao mockDao;
+	Dao mockDao;
 	
 	@Before
 	public void setUp() {
@@ -44,13 +52,20 @@ public class ItemServiceImplTest {
 	}
 
 	private void setupMockDao() {
-		mockDao = mock(ItemDao.class);
+		mockDao = mock(Dao.class);
 		
-		// Use local items as mock repository
-		when(mockDao.findItemByName(anyString())).thenAnswer(i -> items.get(i.getArguments()[0]));
+		// Use local mock repository
+		when(mockDao.findItemByName(anyString())).thenAnswer(i -> items.get(i.getArguments()[0]));		
+	}
+	
+	private void setupMockOffers(Set<Offer> mockOffers) {
+		when(mockDao.getOffers()).thenReturn(mockOffers);
 	}
 
-	
+
+	/*
+	 *  Tests for GetItem
+	 */
 	@Test
 	public final void testGetItem() {
 		String testName = "Apples";
@@ -81,6 +96,9 @@ public class ItemServiceImplTest {
 	}
 
 	
+	/*
+	 *  Tests for GetItems
+	 */
 	@Test
 	public final void testGetItems() {
 		List<String> testNames = Arrays.asList("Apples", "Oranges", "Papayas", "Papayas");
@@ -92,7 +110,6 @@ public class ItemServiceImplTest {
 		
 		assertEquals(expectedItems, actualItems);
 	}
-
 	
 	@Test
 	public final void testGetItems_OneItem() {
@@ -145,4 +162,43 @@ public class ItemServiceImplTest {
 	}
 
 
+	/*
+	 *  Tests for GetItemsOnOffer
+	 */
+	@Test
+	public final void testGetItemsOnOffer_RetrieveOffer() {		
+		setupMockOffers(new HashSet<>(Arrays.asList(mockOffer1)));
+		Map<Item,Offer> expected = new HashMap<>();
+		expected.put(mockOffer1.getOfferItem(), mockOffer1);
+
+		Set<Item> testItems = new HashSet<>(items.values());		
+		Map<Item,Offer> actual = itemService.getItemsOnOffer(testItems);
+		
+		assertEquals(expected,actual);
+	}
+	
+	@Test
+	public final void testGetItemsOnOffer_NoOffer() {
+		setupMockOffers(new HashSet<>());
+		Map<Item,Offer> expected = new HashMap<>();
+		
+		Set<Item> testItems = new HashSet<>(items.values());
+		Map<Item,Offer> actual = itemService.getItemsOnOffer(testItems);
+		
+		assertEquals(expected,actual);
+	}
+	
+	@Test
+	public final void testGetItemsOnOffer_TwoOffers() {	
+		setupMockOffers(new HashSet<>(Arrays.asList(mockOffer1, mockOffer2)));
+		Map<Item,Offer> expected = new HashMap<>();
+		expected.put(mockOffer1.getOfferItem(), mockOffer1);
+		expected.put(mockOffer2.getOfferItem(), mockOffer2);
+		
+		
+		Set<Item> testItems = new HashSet<>(items.values());
+		Map<Item,Offer> actual = itemService.getItemsOnOffer(testItems);
+		
+		assertEquals(expected,actual);
+	}
 }

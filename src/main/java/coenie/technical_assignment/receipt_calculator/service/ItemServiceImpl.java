@@ -1,6 +1,9 @@
 package coenie.technical_assignment.receipt_calculator.service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.LogManager;
@@ -10,18 +13,19 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import coenie.technical_assignment.receipt_calculator.dao.ItemDao;
+import coenie.technical_assignment.receipt_calculator.dao.Dao;
 import coenie.technical_assignment.receipt_calculator.model.Item;
+import coenie.technical_assignment.receipt_calculator.model.Offer;
 
 @Service
 public class ItemServiceImpl implements ItemService {
 	private final Logger log = LogManager.getLogger(this.getClass());
 	
-	private ItemDao itemDao;
+	private Dao dao;
 	
 	@Autowired
-	public ItemServiceImpl (ItemDao itemDao) {
-		this.itemDao=itemDao;
+	public ItemServiceImpl (Dao dao) {
+		this.dao=dao;
 	}
 
 	@Override
@@ -35,7 +39,7 @@ public class ItemServiceImpl implements ItemService {
 			throw new IllegalArgumentException(errorMessage);
 		}
 		
-		Item result = itemDao.findItemByName(itemName);
+		Item result = dao.findItemByName(itemName);
 		
 		if (result == null) {
 			log.error("Could not retreive item named {}", itemName);
@@ -58,6 +62,13 @@ public class ItemServiceImpl implements ItemService {
 		return itemNames.stream()
 				.map(itemName -> getItem(itemName)) // Will throw Exception from getItem method
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public Map<Item, Offer> getItemsOnOffer(Set<Item> items) {
+		Set<Offer> currentOffers = dao.getOffers();
+		
+		return currentOffers.stream().collect(Collectors.toMap(Offer::getOfferItem,Function.identity()));
 	}
 
 }

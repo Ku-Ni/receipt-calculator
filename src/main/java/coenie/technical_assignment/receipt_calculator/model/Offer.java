@@ -2,11 +2,9 @@ package coenie.technical_assignment.receipt_calculator.model;
 
 public interface Offer {
 	/**
-	 * Adds the item to this offer
-	 * 
-	 * @param item
+	 * Increases the amount of items connected to this offer
 	 */
-	void addItem(Item item);
+	void addItem();
 	
 	/**
 	 * Returns the number of times this offer is applied
@@ -16,11 +14,6 @@ public interface Offer {
 	 * @return number of offers
 	 */
 	int getNumOffersApplied();
-	
-	/**
-	 * @return This offer type
-	 */
-	OfferType getOfferType();
 	
 	/**
 	 * @return The item this offer applies to

@@ -18,11 +18,11 @@ import coenie.technical_assignment.receipt_calculator.model.Receipt;
 public class CostServiceImpl implements CostService {
 	private final Logger log = LogManager.getLogger(this.getClass());
 
-	private OfferService offerService;
+	private ItemService itemService;
 
 	@Autowired
-	public CostServiceImpl(OfferService offerService) {
-		this.offerService = offerService;
+	public CostServiceImpl(ItemService itemService) {
+		this.itemService = itemService;
 	}
 
 
@@ -38,7 +38,7 @@ public class CostServiceImpl implements CostService {
 
 		int totalAmount = items.stream().mapToInt(item->item.getPrice()).sum();
 
-		Map<Item,Offer> itemsOnOffer = offerService.getItemsOnOffer(new HashSet<>(items));
+		Map<Item,Offer> itemsOnOffer = itemService.getItemsOnOffer(new HashSet<>(items));
 
 		// Adds items to Offers
 		if(!CollectionUtils.isEmpty(itemsOnOffer)) {
@@ -46,7 +46,7 @@ public class CostServiceImpl implements CostService {
 
 			items.stream()
 			.filter(item->itemsOnOffer.containsKey(item))
-			.forEach(item->itemsOnOffer.get(item).addItem(item));
+			.forEach(item->itemsOnOffer.get(item).addItem());
 
 			totalAmount = totalAmount-itemsOnOffer.values().stream()
 					.mapToInt(offer->offer.getNumOffersApplied()*offer.getOfferAmount())

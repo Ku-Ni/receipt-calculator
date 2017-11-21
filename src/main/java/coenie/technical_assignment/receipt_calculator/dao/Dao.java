@@ -1,7 +1,12 @@
 package coenie.technical_assignment.receipt_calculator.dao;
 
-import coenie.technical_assignment.receipt_calculator.model.Item;
+import java.util.Set;
 
-public interface ItemDao {
+import coenie.technical_assignment.receipt_calculator.model.Item;
+import coenie.technical_assignment.receipt_calculator.model.Offer;
+
+public interface Dao {
 	Item findItemByName(String name);
+
+	Set<Offer> getOffers();
 }
